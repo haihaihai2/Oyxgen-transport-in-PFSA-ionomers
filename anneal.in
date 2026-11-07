@@ -1,0 +1,274 @@
+#-------------------------------Initialization--------------------------------#
+echo           both
+units          real
+atom_style     full
+pair_style     lj/cut/coul/long  15.0 
+pair_modify    mix arithmetic 
+
+kspace_style   pppm 1.0e-4   
+
+bond_style     harmonic
+special_bonds  dreiding
+angle_style    harmonic
+dihedral_style harmonic
+
+dimension      3
+boundary       p p p
+
+#-------------------------------Data Input--------------------------------#
+read_data       oxygenjump3.data  	 extra/atom/types 1   extra/bond/types 1
+molecule        testO2mol testO2.txt  offset 9 10 20 23 0 
+create_atoms    0 random 1 492845 NULL mol testO2mol  596895    
+
+mass   1   15.9994   # Ow
+mass   2   1.00797   # Hw
+mass   3   15.9994   # Oh
+mass   4   1.00797   # Hh
+mass   5   12.01100  # C
+mass   6   18.998400 # F
+mass   7   12.01100  # C'
+mass   8   15.999400 # O
+mass   9   32.064000 # S
+mass  10   15.999400 # testO2 gas
+
+####pair_coeff  I  J  ε(kcal/mol)   σ(Å)    
+pair_coeff   1  1      0.1848     3.16554     # Ow
+pair_coeff   2  2      0.01       0.80181     # Hw
+pair_coeff   3  3      0.1848     3.16554     # Oh
+pair_coeff   4  4      0.01       0.80181     # Hh
+pair_coeff   5  5      0.0844     3.45998     # c
+pair_coeff   6  6      0.0496     3.02487     # f
+pair_coeff   7  7      0.0951     3.47299     # c'
+pair_coeff   8  8      0.0957     3.03315     # o
+pair_coeff   9  9      0.3440     3.59032     # s
+pair_coeff   10  10    0.10798    3.05        # testO2
+
+####bond_coeff  Serial-number   K(including 1/2)(kcal/mol/Å2)   r0(Å)           
+bond_coeff    1    250.000      1.0000   # Ow-Hw
+bond_coeff    2    542.97825    0.9820	# Oh-Hh
+bond_coeff    3    302.62975    1.3360  	# c-f
+bond_coeff    4    214.6602     1.4982 	# c-c 
+bond_coeff    5    350.0000     1.5300 	# c-c'
+bond_coeff    6    350.0000     1.4200	# c'-o
+bond_coeff    7    302.62975    1.3360 	# f-c'
+bond_coeff    8    350.0000     1.5300 	# C'-C'
+bond_coeff    9    350.0000     1.8000 	# C'-S
+bond_coeff    10   350.0000     1.4800 	# S-O
+bond_coeff    11   847.0        1.208   # O2-O2 (bond of testO2)
+ 
+####angle_coeff  Serial-number   Kθ(including 1/2)(kcal/mol/rad2)  θ(rad)
+angle_coeff   1     60.000      109.4700 	 # Hw-Ow-Hw
+angle_coeff   2     39.51315    113.4000 	 # Hh-Oh-Hh  
+angle_coeff   3     54.1198     121.5020 	 # F_-C-F_
+angle_coeff   4     50.1683     118.3191 	 # C-C-F_
+angle_coeff   5     53.13695    122.5536 	 # C-C-C
+angle_coeff   6     53.13695    122.5536 	 # C-C-C'
+angle_coeff   7     50.1683     118.3191 	 # F_-C-C'
+angle_coeff   8     50.0000     109.5700     # F_-C'-O
+angle_coeff   9     50.0000     109.4710	 # C-C'-O
+angle_coeff  10     50.1683     118.3191 	 # C-C'-F_
+angle_coeff  11     53.13695    122.5536	 # C-C'-C
+angle_coeff  12     50.0000     125.2300	 # C'-O-C'
+angle_coeff  13     50.0000     109.4710	 # C'-C'-O
+angle_coeff  14     50.1683     118.3191	 # F_-C'-C'
+angle_coeff  15     54.1198     121.5020 	 # F_-C'-F_
+angle_coeff  16     53.13695    122.5536  	 # C'-C'-C'
+angle_coeff  17     50.0000     116.8100	 # C'-C'-S
+angle_coeff  18     50.0000     110.3000	 # F_-C'-S
+angle_coeff  19     175.0000    102.6500	 # C'-S-O
+angle_coeff  20     175.0000    115.5000	 # O-S-O
+
+
+####dihedral_coeff  dihedral-type  K(including 1/2)(kcal/mol)  d(+1or-1)  n(integer>=0)
+dihedral_coeff  1     2.0611   -1   3 	# c-c-c-f       
+dihedral_coeff  2     2.0212    1   3   # f-c-c-f       
+dihedral_coeff  3     1.60855  -1   3   # c-c-c-c       
+dihedral_coeff  4     0.5000    1   3 	# f-c-c-C'      *
+dihedral_coeff  5     0.5000    1   3 	# c-c-c-C'      *  
+dihedral_coeff  6     0.5000    1   3   # c-c-C'-O    
+dihedral_coeff  7     0.5000    1   3   # c-c-C'-f      *  
+dihedral_coeff  8     0.5000    1   3   # c-c-C'-c      * 
+dihedral_coeff  9     0.5000    1   3   # f-c-C'-O    
+dihedral_coeff  10     0.5000    1   3   # f-c-C'-f      *
+dihedral_coeff  11     0.5000    1   3   # f-c-C'-c      *  
+dihedral_coeff  12     0.5000    1   3   # f-C'-O-C'   
+dihedral_coeff  13     0.5000    1   3   # c-C'-O-C'  
+dihedral_coeff  14     0.5000    1   3   # C'-C'-O-C'   
+dihedral_coeff  15     0.5000    1   3   # C'-C'-C'-O
+dihedral_coeff  16     0.5000    1   3   # O-C'-C'-O
+dihedral_coeff  17     0.5000    1   3   # f-C'-C'-O
+dihedral_coeff  18     0.5000    1   3   # f-C'-C'-C' 
+dihedral_coeff  19     0.5000    1   3   # f-C'-C'-f  
+dihedral_coeff  20     0.5000    1   3   # O-C'-C'-s
+dihedral_coeff  21     0.5000    1   3   # f-C'-C'-s
+dihedral_coeff  22     0.5000    1   3   # C'-C'-s-O    
+dihedral_coeff  23     0.5000    1   3   # f-C'-s-O   
+
+#------------------------------Initial Setting-----------------------------------#
+
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes
+timestep 		1
+thermo   		100
+thermo_style    custom step temp press density ke pe etotal 
+group         O2  type 10
+
+group         nafion type 5 6 7 8 9 
+group         water  type 1 2 3 4
+group         nafionwater union nafion water
+group         F type 6
+group         O type 1 3 8
+#---------------------------------minimize energy------------------------------------------#
+fix 		 0 all nve/limit 0.1
+run 		 1000
+unfix        0
+#---------------------------------fix bond length------------------------------------------#
+fix 		 fShakeO2 O2 shake 0.0001 20 0 b 11    ####注意看bond type
+#---------------------------------annealing------------------------------------------#
+reset_timestep 0  
+#dump          0 all custom 1000 0.lammpstrj id type x y z 
+
+fix           01 all npt temp 353.0 353.0 $(100.0*dt) iso 100.0 100.0 $(1000.0*dt)   #pressure unit is atm
+run           500000       
+unfix         01
+
+fix           02 all npt temp 353.0 353.0 $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)   #pressure unit is atm
+run           500000       
+unfix         02
+
+#undump      0
+#---------------------------------annealing 1--------------------------------------------------#
+reset_timestep 0
+#dump          1 all custom 1000 1.lammpstrj id type x y z 
+
+fix           11 all nvt temp 353 1000 $(100.0*dt)
+run           100000    
+unfix         11
+
+fix           12 all nvt temp 1000 1000 $(100.0*dt)
+run           100000      
+unfix         12
+
+fix           13 all nvt temp 1000 353 $(100.0*dt)
+run           100000      
+unfix         13
+
+fix           14 all nvt temp 353 353 $(100.0*dt)
+run           100000      
+unfix         14
+
+fix           21 all nvt temp 353 1000 $(100.0*dt)
+run           100000    
+unfix         21
+
+fix           22 all nvt temp 1000 1000 $(100.0*dt)
+run           100000      
+unfix         22
+
+fix           23 all nvt temp 1000 353 $(100.0*dt)
+run           100000      
+unfix         23
+
+fix           24 all nvt temp 353 353 $(100.0*dt)
+run           100000      
+unfix         24
+
+fix           31 all nvt temp 353 1000 $(100.0*dt)
+run           100000    
+unfix         31
+
+fix           32 all nvt temp 1000 1000 $(100.0*dt)
+run           100000      
+unfix         32
+
+fix           33 all nvt temp 1000 353 $(100.0*dt)
+run           100000      
+unfix         33
+
+fix           34 all nvt temp 353 353 $(100.0*dt)
+run           100000      
+unfix         34
+
+#undump        1
+#---------------------------------annealing 2--------------------------------------------------#
+reset_timestep 0
+
+#dump          2 all custom 2000 2.lammpstrj id type x y z 
+fix           2 all npt temp 353.0 353.0 $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)   #pressure unit is atm
+run           5000000       
+unfix         2
+#undump        2
+#--------------------------------------------Data Analysis------------------------------------------------#
+reset_timestep 0
+
+group         Owtare type 1 3 
+variable      SOatom atom "q==-0.6320"       #磺酸基的氧原子
+group         SO variable SOatom
+group         Os union Owtare SO              #亲水相里面的氧原子
+dump	   	  qinshui1 Os custom 100 data_Os.lammpstrj type x y z #亲水相里面的氧原子
+group         S type 9
+dump	   	  qinshui2 S custom 100 data_S.lammpstrj type x y z #亲水相里面的硫原子
+group         H type 2 4
+dump	   	  qinshui3 H custom 100 data_H.lammpstrj type x y z #亲水相里面的氢原子
+
+group         hydrophilic union Os S H
+
+group         Cb type 5
+dump	   	  shushui1 Cb custom 100 data_Cb.lammpstrj type x y z #骨架碳原子
+variable      Fatom atom "q==-0.1923"        
+group         Fb variable Fatom
+dump	   	  shushui2 Fb custom 100 data_Fb.lammpstrj type x y z #骨架上的氟原子
+
+group         hydrophobic union Cb Fb
+
+group         Cs type 7
+dump	   	  jiemian1 Cs custom 100 data_Cs.lammpstrj type x y z     #侧链上的碳原子
+group         Fs subtract F Fb
+dump	   	  jiemian2 Fs custom 100 data_Fs.lammpstrj type x y z     #侧链上的氟原子
+group         Oc subtract O Os     
+dump	   	  jiemian3 Oc custom 100 data_Oc.lammpstrj type x y z     #侧链上的氧原子
+
+group         interface union Cs Fs Oc
+
+dump	   	  oxygen O2 custom 100 data_oxygen.lammpstrj id type x y z 
+dump          system all custom 1000 data_all.lammpstrj id type x y z     #输出全部原子轨迹用于计算孔隙分布（以防万一）
+
+compute 	  O2cc1 O2 chunk/atom molecule
+compute 	  O2myChunk O2 com/chunk O2cc1  #计算质心坐标
+
+compute       O2vcm O2 vcm/chunk O2cc1   	#计算质心速度
+compute       perO2vcm O2 global/atom c_O2cc1 c_O2vcm[*]  	  #求每一个chunk的unwrap质心速度
+
+compute 	  O2prop O2 property/atom xu yu zu                #相对距离必须用unwrap形式坐标（单个氧原子）
+compute 	  O2glob O2 global/atom c_O2cc1 c_O2myChunk[*]    #求每一个chunk的unwrap质心坐标（整个氧分子）
+variable 	  O2dx atom 2*(c_O2prop[1]-c_O2glob[1]) 		  #氧气分子轴向vector沿x方向分量
+variable 	  O2dy atom 2*(c_O2prop[2]-c_O2glob[2])			  #氧气分子轴向vector沿y方向分量
+variable 	  O2dz atom 2*(c_O2prop[3]-c_O2glob[3]) 		  #氧气分子轴向vector沿z方向分量
+
+dump 		  O2mybond O2 custom 100 O2bond.dump c_O2glob[*] c_perO2vcm[*] v_O2dx v_O2dy v_O2dz    
+dump_modify   O2mybond sort id 
+dump 		  O2mybond2 O2 custom 10 O2bond2.dump id xu yu zu c_O2glob[*] c_perO2vcm[*] v_O2dx v_O2dy v_O2dz 
+dump_modify   O2mybond2 sort id
+
+compute       ener O2 bond/local engrot engtrans force omega     #计算键的能量 omega = magnitude of bond angular velocity
+dump 		  ener all local 100 tmp.dump index c_ener[*] 
+
+compute       myTemp2 O2 temp         						 #氧气分子没有去掉质心速度后的温度
+compute 	  mype all pe/atom                               #计算平均每个原子势能
+compute 	  peO2 O2 reduce sum c_mype                      #计算氧气分子势能
+compute       allinteract O2 group/group nafionwater         #计算氧气分子与离聚物的相互作用能
+compute       interfaceinteract O2 group/group interface     #计算氧气分子与离聚物亲疏水界面相的相互作用能
+compute       qinshuiinteract O2 group/group hydrophilic     #计算氧气分子与离聚物亲水相的相互作用能
+compute       shushuiinteract O2 group/group hydrophobic     #计算氧气分子与离聚物疏水性的相互作用能
+thermo_style  custom step xlo xhi ylo yhi zlo zhi density temp c_myTemp2 pe c_peO2 c_allinteract c_interfaceinteract c_qinshuiinteract c_shushuiinteract
+
+fix           3 all npt temp 353.0 353.0 $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)   #pressure unit is atm
+run           10000000                       #采样要采到10ns才足够多    
+
+write_data    fianl_configuration.data
+
+
+
+
+
+
