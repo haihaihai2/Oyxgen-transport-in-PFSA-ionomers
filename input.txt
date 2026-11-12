@@ -1,0 +1,108 @@
+#-------------------------------Initialization--------------------------------#
+echo            both
+units           real
+atom_style      full
+pair_style      lj/cut/coul/long  15.0 
+pair_modify     mix arithmetic 
+kspace_style    pppm 1.0e-4   
+bond_style      harmonic
+special_bonds   dreiding
+angle_style     harmonic
+dihedral_style  harmonic
+dimension       3
+boundary        p p p
+#-------------------------------Data Input--------------------------------#
+read_data       oxygenjump3.data  	  
+#------------------------------Initial Setting-----------------------------------#
+neighbor        2.0 bin
+neigh_modify    every 1 delay 0 check yes
+timestep 		1
+thermo   		100
+thermo_style    custom step temp press density ke pe etotal 
+group           nafion type 5 6 7 8 9 
+group           water  type 1 2 3 4
+group           nafionwater union nafion water
+group           Ow type 1
+group           Oh type 3
+write_data      initial_configuration.data
+#---------------------------------minimize energy------------------------------------------#
+minimize        1.0e-5 1.0e-7 1000 10000 
+#---------------------------------annealing------------------------------------------#
+reset_timestep  0  
+dump            0 all custom 1000 0.lammpstrj id type x y z 
+fix             01 all npt temp 353.0 353.0 $(100.0*dt) iso 100.0 100.0 $(1000.0*dt)   #pressure unit is atm
+run             500000       
+unfix           01
+fix             02 all npt temp 353.0 353.0 $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)   #pressure unit is atm
+run             500000       
+unfix           02
+undump          0
+#---------------------------------annealing 1--------------------------------------------------#
+reset_timestep 0
+dump          1 all custom 1000 1.lammpstrj id type x y z 
+fix           11 all nvt temp 353 1000 $(100.0*dt)
+run           100000    
+unfix         11
+fix           12 all nvt temp 1000 1000 $(100.0*dt)
+run           100000      
+unfix         12
+fix           13 all nvt temp 1000 353 $(100.0*dt)
+run           100000      
+unfix         13
+fix           14 all nvt temp 353 353 $(100.0*dt)
+run           100000      
+unfix         14
+fix           21 all nvt temp 353 1000 $(100.0*dt)
+run           100000    
+unfix         21
+fix           22 all nvt temp 1000 1000 $(100.0*dt)
+run           100000      
+unfix         22
+fix           23 all nvt temp 1000 353 $(100.0*dt)
+run           100000      
+unfix         23
+fix           24 all nvt temp 353 353 $(100.0*dt)
+run           100000      
+unfix         24
+fix           31 all nvt temp 353 1000 $(100.0*dt)
+run           100000    
+unfix         31
+fix           32 all nvt temp 1000 1000 $(100.0*dt)
+run           100000      
+unfix         32
+fix           33 all nvt temp 1000 353 $(100.0*dt)
+run           100000      
+unfix         33
+fix           34 all nvt temp 353 353 $(100.0*dt)
+run           100000      
+unfix         34
+undump        1
+#---------------------------------annealing 2--------------------------------------------------#
+reset_timestep 0
+dump          2 all custom 2000 2.lammpstrj id type x y z 
+fix           2 all npt temp 353.0 353.0 $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)   
+run           5000000       
+unfix         2
+undump        2
+#--------------------------------------------Data Analysis------------------------------------------------#
+reset_timestep 0
+dump          system all custom 1000 data_all.lammpstrj id type x y z     
+compute 	  Msd1 Ow msd com yes    
+variable      twopoint1 equal c_Msd1[4]/(6*(step*dt+1.0e-6))     
+fix           D1 all vector 10 c_Msd1[4]                    
+variable      fitslope1 equal slope(f_D1)/6/(10*dt)             
+fix           fmsd1 Ow ave/time 500 1 500 c_Msd1[4] v_twopoint1 v_fitslope1 file MSD&D_Ow.out 
+compute 	  Msd2 Oh msd com yes    
+variable      twopoint2 equal c_Msd2[4]/(6*(step*dt+1.0e-6))     
+fix           D2 all vector 10 c_Msd2[4]                    
+variable      fitslope2 equal slope(f_D2)/6/(10*dt)             
+fix           fmsd2 Oh ave/time 500 1 500 c_Msd2[4] v_twopoint2 v_fitslope2 file MSD&D_Oh.out 
+fix           3 all npt temp 353.0 353.0 $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)   
+fix           002 all recenter INIT INIT INIT    
+run           10000000                        
+write_data    fianl_configuration.data
+
+
+
+
+
